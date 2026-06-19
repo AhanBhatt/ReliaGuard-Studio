@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the repository release."
+title: "ReliaGuard Studio"
+version: "0.1.0"
+authors:
+  - family-names: "Bhatt"
+    given-names: "Ahan"
+type: software
+repository-code: "https://github.com/AhanBhatt/ReliaGuard-Studio"
+abstract: "A production-style AI evaluation platform for reliance-state analysis, neuro-symbolic modeling, calibration, and conformal selective-risk accounting in human-AI collaboration."
+license: "NOASSERTION"

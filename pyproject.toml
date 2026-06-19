@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "reliaguard-studio"
+version = "0.1.0"
+description = "ReliaGuard Studio: a production-style AI evaluation platform for reliance-state modeling and conformal gating across human-AI environments."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "License pending repository owner decision. See README.md."}
+authors = [
+  {name = "Ahan Bhatt"},
+  {name = "OpenAI Codex collaborator"}
+]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scikit-learn>=1.5",
+  "torch>=2.2",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.2",
+  "PyYAML>=6.0",
+  "matplotlib>=3.8",
+  "networkx>=3.2",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "httpx>=0.27",
+  "typer>=0.12",
+  "python-pptx>=1.0.2",
+  "pypdf>=4.3",
+  "statsmodels>=0.14",
+  "openpyxl>=3.1",
+  "svgwrite>=1.4.3",
+  "cairosvg>=2.9.0",
+  "pymupdf>=1.27",
+  "psutil>=5.9"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2"
+]
+mlops = [
+  "mlflow>=2.14"
+]
+
+[project.scripts]
+nsca = "reliaguard_studio.cli:app"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+reliaguard_studio = [
+  "config/*.yaml",
+  "frontend/static/*"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-p no:cacheprovider"
+filterwarnings = [
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated.*:Warning",
+  "ignore:Tight layout not applied.*:UserWarning",
+]

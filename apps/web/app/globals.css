@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #f4ead9;
+  color: #111a1f;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 10% 8%, rgba(198, 95, 70, 0.22), transparent 24rem),
+    radial-gradient(circle at 88% 2%, rgba(46, 118, 144, 0.24), transparent 28rem),
+    radial-gradient(circle at 78% 80%, rgba(40, 105, 93, 0.14), transparent 26rem),
+    linear-gradient(135deg, rgba(17, 26, 31, 0.052) 25%, transparent 25%) 0 0 / 22px 22px,
+    linear-gradient(180deg, #fff8ea 0%, #f4ead9 42%, #ece0cf 100%);
+  font-family: Aptos, "Segoe UI Variable Text", "Trebuchet MS", sans-serif;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(198, 95, 70, 0.28);
+}
+
+a, button, input {
+  outline-color: #2e7690;
+}
+
+.glass {
+  border: 1px solid rgba(17, 26, 31, 0.14);
+  background:
+    linear-gradient(145deg, rgba(255, 248, 234, 0.90), rgba(244, 234, 217, 0.76)),
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.45), transparent 12rem);
+  backdrop-filter: blur(18px);
+}
+
+.instrument {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass.instrument-dark {
+  border-color: rgba(255, 248, 234, 0.18);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(198, 95, 70, 0.22), transparent 18rem),
+    radial-gradient(circle at 90% 8%, rgba(46, 118, 144, 0.24), transparent 20rem),
+    linear-gradient(145deg, #111a1f 0%, #172329 48%, #223238 100%);
+  color: #fff8ea;
+}
+
+.instrument::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(17, 26, 31, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(17, 26, 31, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(90deg, rgba(0,0,0,0.5), transparent 72%);
+}
+
+.instrument-dark::before {
+  background:
+    linear-gradient(90deg, rgba(255, 248, 234, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(255, 248, 234, 0.06) 1px, transparent 1px);
+}
+
+.range-control {
+  accent-color: #c65f46;
+}
+
+.microbar {
+  background: linear-gradient(90deg, #28695d, #c99634, #c65f46);
+}

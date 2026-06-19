@@ -1,0 +1,425 @@
+metadata:
+  title: "ReliaGuard Studio"
+  short_name: "ReliaGuard"
+  framing_note: "The primary empirical pipeline models appropriate reliance in public human-AI decision-making datasets. AIR-Bench retention and transfer constructs are supplementary synthetic stress tests only, not current empirical findings."
+  manuscript_title: "ReliaGuard Studio: Reliance-State Modeling and Conformal Gating Across Human-AI Environments"
+
+simulation:
+  seed: 42
+  n_users: 320
+  sessions_per_user: 10
+  benchmark_repetitions: 1
+
+model:
+  sequence_length: 5
+  bootstrap_samples: 40
+  hidden_dim: 32
+  dropout: 0.15
+
+targets:
+  - delayed_recall_success
+  - transfer_success
+  - verification_failure
+  - overreliance_risk
+  - high_offloading_behavior
+
+regression_targets:
+  - retention_gap
+
+indicators:
+  - id: cognitive_offloading_index
+    name: "Cognitive Offloading Index"
+    description: "Composite indicator of how strongly a participant substitutes AI output for independent processing."
+    direction: "higher_is_riskier"
+    category: "behavioral"
+    source_note: "Derived from copy-paste, edit dependence, and prompt depth patterns."
+  - id: verification_robustness
+    name: "Verification Robustness"
+    description: "Ability to inspect, challenge, and correct AI outputs before submission."
+    direction: "lower_is_riskier"
+    category: "behavioral"
+    source_note: "Human-AI verification and automation-bias literature."
+  - id: retention_gap
+    name: "Retention Gap"
+    description: "Difference between assisted immediate performance and delayed recall performance."
+    direction: "higher_is_riskier"
+    category: "learning"
+    source_note: "AI-assisted learning and cognitive offloading literature."
+  - id: transfer_gap
+    name: "Transfer Gap"
+    description: "Difference between assisted task performance and later unassisted transfer performance."
+    direction: "higher_is_riskier"
+    category: "learning"
+    source_note: "Transfer-of-learning literature."
+  - id: overreliance_score
+    name: "Overreliance Score"
+    description: "Risk that a participant accepts plausible but incorrect AI outputs."
+    direction: "higher_is_riskier"
+    category: "safety"
+    source_note: "Automation bias and overreliance literature."
+  - id: edit_distance_reliance
+    name: "Edit Distance Reliance"
+    description: "Inverse edit distance between the AI suggestion and the participant final answer."
+    direction: "higher_is_riskier"
+    category: "behavioral"
+    source_note: "Behavioral trace metric introduced in AIR-Bench."
+  - id: prompt_depth_score
+    name: "Prompt Depth Score"
+    description: "A proxy for reflective querying depth and dialog quality."
+    direction: "lower_is_riskier"
+    category: "behavioral"
+    source_note: "Prompt-elicitation depth metric introduced in AIR-Bench."
+  - id: copy_paste_dependence
+    name: "Copy-Paste Dependence"
+    description: "Fraction of final submission that is directly copied from AI content."
+    direction: "higher_is_riskier"
+    category: "behavioral"
+    source_note: "Reliance signal based on task-edit logs."
+  - id: source_checking_rate
+    name: "Source Checking Rate"
+    description: "Fraction of presented sources that are opened or inspected."
+    direction: "lower_is_riskier"
+    category: "verification"
+    source_note: "Verification behavior metric."
+  - id: calibration_error
+    name: "Calibration Error"
+    description: "Absolute mismatch between participant confidence and correctness."
+    direction: "higher_is_riskier"
+    category: "metacognitive"
+    source_note: "Calibration and uncertainty literature."
+  - id: explanation_faithfulness
+    name: "Explanation Faithfulness"
+    description: "Agreement between explanation factors and the synthetic latent driver."
+    direction: "lower_is_riskier"
+    category: "xai"
+    source_note: "Measured only in simulation where latent drivers are known."
+  - id: intervention_benefit
+    name: "Intervention Benefit"
+    description: "Improvement relative to standard AI assistance under a safer intervention condition."
+    direction: "lower_is_riskier"
+    category: "intervention"
+    source_note: "Counterfactual benefit estimate across assistance conditions."
+
+usage_patterns:
+  - id: answer_substitution
+    description: "Participant replaces original reasoning with AI output."
+    risk_level: "high"
+    impact_score: 0.90
+    detection_method: "copy_trace_and_edit_distance"
+  - id: shallow_prompting
+    description: "Participant relies on one-shot prompting with little reflective querying."
+    risk_level: "cautionary"
+    impact_score: 0.62
+    detection_method: "prompt_depth_analysis"
+  - id: source_blind_acceptance
+    description: "Participant accepts cited output without opening sources."
+    risk_level: "high"
+    impact_score: 0.86
+    detection_method: "source_interaction_logging"
+  - id: reflective_tutoring
+    description: "Participant requests scaffolding and paraphrases concepts before answer reveal."
+    risk_level: "protective"
+    impact_score: 0.24
+    detection_method: "dialog_pattern_analysis"
+  - id: verification_first
+    description: "Participant verifies claims before final submission."
+    risk_level: "protective"
+    impact_score: 0.20
+    detection_method: "event_order_analysis"
+
+task_families:
+  - id: reading_comprehension
+    name: "Reading comprehension"
+    description: "Passage-based comprehension with inference and retention probes."
+    difficulty_range: [0.25, 0.75]
+    verification_demand: 0.35
+    recall_demand: 0.55
+    transfer_demand: 0.40
+  - id: scientific_reasoning
+    name: "Scientific reasoning"
+    description: "Experimental interpretation, causal reasoning, and critique."
+    difficulty_range: [0.35, 0.85]
+    verification_demand: 0.65
+    recall_demand: 0.40
+    transfer_demand: 0.65
+  - id: coding
+    name: "Coding"
+    description: "Debugging, trace reasoning, and code-completion transfer."
+    difficulty_range: [0.30, 0.85]
+    verification_demand: 0.70
+    recall_demand: 0.30
+    transfer_demand: 0.80
+  - id: mathematical_reasoning
+    name: "Mathematical reasoning"
+    description: "Symbolic and word-problem reasoning with error analysis."
+    difficulty_range: [0.25, 0.80]
+    verification_demand: 0.55
+    recall_demand: 0.45
+    transfer_demand: 0.75
+  - id: writing_synthesis
+    name: "Writing synthesis"
+    description: "Multi-source argument synthesis and evidence integration."
+    difficulty_range: [0.30, 0.70]
+    verification_demand: 0.60
+    recall_demand: 0.40
+    transfer_demand: 0.55
+  - id: source_verification
+    name: "Source verification"
+    description: "Claim verification against citations or source excerpts."
+    difficulty_range: [0.20, 0.75]
+    verification_demand: 0.90
+    recall_demand: 0.20
+    transfer_demand: 0.35
+  - id: false_answer_detection
+    name: "False AI answer detection"
+    description: "Detection of plausible but incorrect AI responses."
+    difficulty_range: [0.25, 0.85]
+    verification_demand: 0.95
+    recall_demand: 0.20
+    transfer_demand: 0.50
+
+assistance_conditions:
+  - id: no_ai
+    name: "No AI"
+    description: "Participant works without AI assistance."
+    ai_helpfulness: 0.00
+    citation_support: 0.00
+    flaw_plausibility: 0.00
+    verification_prompt: 0.00
+    reflection_prompt: 0.00
+    tutor_scaffolding: 0.00
+  - id: standard_ai
+    name: "Standard AI answer"
+    description: "Direct AI answer with no additional scaffolding."
+    ai_helpfulness: 0.78
+    citation_support: 0.10
+    flaw_plausibility: 0.18
+    verification_prompt: 0.05
+    reflection_prompt: 0.00
+    tutor_scaffolding: 0.05
+  - id: socratic_tutor
+    name: "Socratic AI tutor"
+    description: "Question-led tutoring intended to promote learning transfer."
+    ai_helpfulness: 0.68
+    citation_support: 0.15
+    flaw_plausibility: 0.08
+    verification_prompt: 0.20
+    reflection_prompt: 0.70
+    tutor_scaffolding: 0.90
+  - id: ai_with_citations
+    name: "AI with citations"
+    description: "Answer plus supporting citations and source snippets."
+    ai_helpfulness: 0.76
+    citation_support: 0.85
+    flaw_plausibility: 0.15
+    verification_prompt: 0.30
+    reflection_prompt: 0.10
+    tutor_scaffolding: 0.10
+  - id: flawed_ai
+    name: "Plausible flawed AI"
+    description: "Intentionally plausible but incorrect answer for overreliance testing."
+    ai_helpfulness: 0.42
+    citation_support: 0.20
+    flaw_plausibility: 0.90
+    verification_prompt: 0.00
+    reflection_prompt: 0.00
+    tutor_scaffolding: 0.05
+  - id: verification_required
+    name: "AI with required verification"
+    description: "AI output is available but participants are required to verify before submitting."
+    ai_helpfulness: 0.70
+    citation_support: 0.65
+    flaw_plausibility: 0.12
+    verification_prompt: 0.90
+    reflection_prompt: 0.20
+    tutor_scaffolding: 0.10
+  - id: reflection_before_reveal
+    name: "Reflection before answer reveal"
+    description: "Participant reflects or drafts an answer before seeing the AI output."
+    ai_helpfulness: 0.70
+    citation_support: 0.15
+    flaw_plausibility: 0.12
+    verification_prompt: 0.25
+    reflection_prompt: 0.95
+    tutor_scaffolding: 0.20
+
+metrics:
+  - id: cognitive_offloading_index
+    name: "Cognitive Offloading Index"
+    description: "Higher values indicate stronger substitution of AI output for independent reasoning."
+  - id: verification_robustness
+    name: "Verification Robustness"
+    description: "Higher values indicate stronger verification behavior and better false-answer detection."
+  - id: retention_gap
+    name: "Retention Gap"
+    description: "Immediate assisted performance minus delayed recall."
+  - id: transfer_gap
+    name: "Transfer Gap"
+    description: "Immediate assisted performance minus later unassisted transfer performance."
+  - id: overreliance_score
+    name: "Overreliance Score"
+    description: "Composite risk score for AI overreliance."
+  - id: edit_distance_reliance
+    name: "Edit Distance Reliance"
+    description: "Inverse edit distance similarity between AI answer and final answer."
+  - id: prompt_depth_score
+    name: "Prompt Depth Score"
+    description: "Depth and reflective quality of prompting behavior."
+  - id: copy_paste_dependence
+    name: "Copy-Paste Dependence"
+    description: "Degree of direct copying from AI outputs."
+  - id: source_checking_rate
+    name: "Source Checking Rate"
+    description: "Fraction of available sources actually inspected."
+  - id: calibration_error
+    name: "Calibration Error"
+    description: "Absolute difference between confidence and correctness."
+  - id: explanation_faithfulness
+    name: "Explanation Faithfulness"
+    description: "Agreement between explanations and known latent synthetic drivers."
+  - id: intervention_benefit
+    name: "Intervention Benefit"
+    description: "Performance or safety improvement relative to standard AI assistance."
+
+rules:
+  - id: R001
+    name: "High copy-paste with low verification"
+    group: "verification"
+    description: "Persistent high copy-paste dependence together with low verification suggests overreliance."
+    confidence: 0.90
+    weight: 0.24
+    temporal_window: 3
+    targets: ["verification_failure", "overreliance_risk", "high_offloading_behavior"]
+    antecedents:
+      - feature: "copy_paste_dependence"
+        relation: "high"
+        threshold: 0.70
+      - feature: "verification_robustness"
+        relation: "low"
+        threshold: 0.40
+    counterfactual_hints:
+      - "Reduce direct copying and require a self-explanation before final submission."
+      - "Insert a verification checklist before answer acceptance."
+  - id: R002
+    name: "Plausible wrong answer accepted"
+    group: "verification"
+    description: "Accepting flawed AI output with high confidence is a strong overreliance signal."
+    confidence: 0.95
+    weight: 0.30
+    temporal_window: 1
+    targets: ["verification_failure", "overreliance_risk"]
+    antecedents:
+      - feature: "flawed_answer_acceptance"
+        relation: "high"
+        threshold: 0.60
+      - feature: "confidence"
+        relation: "high"
+        threshold: 0.65
+    counterfactual_hints:
+      - "Require source checking before accepting AI content."
+      - "Lower confidence when evidence has not been independently verified."
+  - id: R003
+    name: "Immediate gain but delayed recall loss"
+    group: "retention"
+    description: "Strong assisted performance followed by weak delayed recall indicates a retention gap."
+    confidence: 0.88
+    weight: 0.22
+    temporal_window: 2
+    targets: ["delayed_recall_success", "high_offloading_behavior"]
+    antecedents:
+      - feature: "immediate_success"
+        relation: "high"
+        threshold: 0.75
+      - feature: "delayed_recall_score"
+        relation: "low"
+        threshold: 0.45
+    counterfactual_hints:
+      - "Introduce reflection or paraphrase prompts before answer reveal."
+      - "Use Socratic tutoring instead of direct answer substitution."
+  - id: R004
+    name: "Immediate gain but weak transfer"
+    group: "transfer"
+    description: "When immediate aided performance is high but later transfer is low, transfer dependence is elevated."
+    confidence: 0.86
+    weight: 0.20
+    temporal_window: 2
+    targets: ["transfer_success", "overreliance_risk"]
+    antecedents:
+      - feature: "immediate_success"
+        relation: "high"
+        threshold: 0.75
+      - feature: "transfer_score"
+        relation: "low"
+        threshold: 0.45
+    counterfactual_hints:
+      - "Use progressive hinting instead of final-answer reveal."
+      - "Add unassisted transfer probes after assistance."
+  - id: R005
+    name: "Source neglect despite citations"
+    group: "verification"
+    description: "Ignoring available citations while trusting the answer elevates verification risk."
+    confidence: 0.84
+    weight: 0.18
+    temporal_window: 1
+    targets: ["verification_failure"]
+    antecedents:
+      - feature: "citation_support"
+        relation: "high"
+        threshold: 0.60
+      - feature: "source_checking_rate"
+        relation: "low"
+        threshold: 0.35
+    counterfactual_hints:
+      - "Require at least one source inspection before submission."
+  - id: R006
+    name: "Rising reliance trajectory"
+    group: "temporal"
+    description: "Increasing cognitive offloading over multiple sessions signals a worsening reliance trajectory."
+    confidence: 0.89
+    weight: 0.23
+    temporal_window: 4
+    targets: ["overreliance_risk", "high_offloading_behavior"]
+    antecedents:
+      - feature: "rolling_offloading"
+        relation: "high"
+        threshold: 0.65
+      - feature: "offloading_trend"
+        relation: "increasing"
+        threshold: 0.55
+    counterfactual_hints:
+      - "Schedule unassisted sessions to reset reliance."
+      - "Move from direct-answer assistance to tutor-style scaffolding."
+  - id: R007
+    name: "Poor calibration under AI assistance"
+    group: "calibration"
+    description: "High confidence combined with low correctness implies calibration failure."
+    confidence: 0.82
+    weight: 0.16
+    temporal_window: 2
+    targets: ["verification_failure", "overreliance_risk"]
+    antecedents:
+      - feature: "calibration_error"
+        relation: "high"
+        threshold: 0.55
+      - feature: "confidence"
+        relation: "high"
+        threshold: 0.70
+    counterfactual_hints:
+      - "Show confidence intervals and encourage confidence calibration."
+  - id: R008
+    name: "Protective reflective tutoring"
+    group: "protective"
+    description: "Reflective scaffolding with strong verification lowers overreliance risk."
+    confidence: 0.78
+    weight: -0.18
+    temporal_window: 2
+    targets: ["verification_failure", "overreliance_risk", "delayed_recall_success", "transfer_success"]
+    antecedents:
+      - feature: "reflection_depth"
+        relation: "high"
+        threshold: 0.60
+      - feature: "verification_robustness"
+        relation: "high"
+        threshold: 0.60
+    counterfactual_hints:
+      - "Retain tutor-style assistance when safe learning transfer matters."

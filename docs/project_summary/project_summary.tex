@@ -1,0 +1,224 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\title{ReliaGuard Studio\\Project Repository Summary}
+\author{Ahan Bhatt}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+ReliaGuard Studio is a production-style AI evaluation platform for detecting overreliance, underreliance, and unsafe human-AI decision behavior. The central product premise is simple: AI assistance can improve average accuracy while still causing harmful reliance failures. A user may accept incorrect AI advice, reject correct advice, become overconfident after flawed support, or need a verification prompt before finalizing a decision.
+
+The platform turns those hidden failure modes into deployable product signals: reliance-state probabilities, calibrated harmful-reliance risk, symbolic rule traces, counterfactual explanations, conformal thresholds, and selective-gating policy outputs. It is not a clinical, diagnostic, cognitive-decline, or causal intervention system. It is an AI evaluation and model-risk analysis platform grounded in public human-AI interaction evidence.
+
+The underlying analysis integrates 43,263 public records from 2,229 participants or students across five datasets: HAIID, CHI 2023 DKE, ConvXAI, Pardos/Bhandari ChatGPT tutoring, and FLoRA IPS. The public repository is organized as a product-oriented code release. Manuscript drafts, research-paper figures, raw datasets, generated results, submission audits, and reviewer materials are intentionally ignored by Git. This protects unpublished paper content and avoids accidental redistribution of third-party data.
+
+\section*{High-Level Architecture}
+
+The repository now uses a full-stack product architecture. The Next.js frontend in \path{apps/web} provides the landing page, interactive case simulator, conformal-gating dashboard, model-evaluation lab, policy-simulation page, data/reproducibility page, and safety/limitations panel. The FastAPI backend in \path{apps/api} exposes reliance prediction, explanation, conformal threshold, policy simulation, ablation, dataset, and model-card endpoints. The Python package under \path{src/reliaguard_studio} remains the source of truth for data adapters, reliance-state logic, symbolic rules, evaluation, statistics, and model artifacts. A product-facing wrapper in \path{packages/relia_core} gives downstream services a smaller import surface.
+
+\begin{longtable}{p{0.27\linewidth} p{0.67\linewidth}}
+\toprule
+\textbf{Area} & \textbf{Role} \\
+\midrule
+\path{apps/web/} & Next.js, TypeScript, Tailwind product frontend for the public ReliaGuard Studio experience. \\
+\path{apps/api/} & FastAPI product service entrypoint that serves calibrated risk, rule traces, thresholds, policy outputs, and model cards. \\
+\path{packages/relia_core/} & Product-facing wrapper around the Python reliance engine for clean imports and future packaging. \\
+\path{config/} & Loads schema-driven YAML configuration and Pydantic schemas for the public reliance-analysis package. \\
+\path{data/} & Defines canonical data schemas, synthetic benchmark utilities, storage helpers, and real public-dataset adapters. \\
+\path{models/} & Implements baselines, fusion models, reliance-state models, and ReliaGuard-NS gating components. \\
+\path{rules/} & Implements symbolic and fuzzy rules for overreliance, underreliance, confidence inflation, process-trace risk, and counterfactual explanations. \\
+\path{evaluation/} & Provides metrics, calibration, GEE statistics, cross-dataset tests, policy simulation, conformal risk control, sensitivity analyses, and claims-audit utilities. \\
+\path{visualization/} & Generates publication-style figures, source-data tables, contact sheets, render-safety checks, and visual-text audits. These outputs are ignored when they belong to the private paper package. \\
+\path{api/} & Exposes the FastAPI application used by both the product API wrapper and legacy local demo routes. \\
+\path{infra/} & Docker Compose and deployment scaffolding for running the web and API services together. \\
+\path{docs/} & Architecture, deployment, model-card, portfolio, and project-summary documentation. \\
+\path{study_platform/} & Provides a prospective validation scaffold with task definitions, randomization, simulation, quality checks, export, and analysis. \\
+\path{theory/} & Encodes reliance-state decomposition and utility-bound helpers used by the method layer. \\
+\bottomrule
+\end{longtable}
+
+\section*{Repository Layout}
+
+\begin{longtable}{p{0.28\linewidth} p{0.66\linewidth}}
+\toprule
+\textbf{Path} & \textbf{Description} \\
+\midrule
+\path{apps/web/} & Product frontend: landing page, simulator, gating dashboard, evaluation lab, policy page, data page, and limitations page. \\
+\path{apps/api/} & Product API entrypoint wrapping the FastAPI application. \\
+\path{packages/relia_core/} & Lightweight product package facade over the reliance-state scoring logic. \\
+\path{infra/} & Docker Compose and deployment notes for local full-stack operation. \\
+\path{src/} & Main installable package. This is the core of the public release. \\
+\path{tests/} & Unit, integration, paper-optional smoke, model, metric, rule, study-platform, and real-data pipeline tests. \\
+\path{experiments/} & Lightweight command wrappers for asset generation and AIR-Bench-style synthetic stress tests. \\
+\path{docs/} & Public docs for architecture, deployment, portfolio/resume positioning, model cards, and this project summary. \\
+\path{notebooks/} & Reserved for exploratory notebooks. Core logic should stay in \path{src/}. \\
+\path{paper/} & Private manuscript source, figures, source data, supplementary files, and PDFs. Ignored by Git. \\
+\path{artifacts/} & Downloaded raw data, prepared data, experiment outputs, runtime databases, and generated reports. Ignored by Git. \\
+\path{.private/} & Local-only archive for legacy prototype files, original documents, submission audits, dataset cards, model cards, and reviewer materials. Ignored by Git. \\
+\path{.private/original_docs/} & Legacy/original project documents if present locally. Ignored by Git. \\
+\bottomrule
+\end{longtable}
+
+\section*{Data Layer}
+
+The data layer maps heterogeneous datasets into common tables for interactions, participants, tasks, and metadata. The canonical schema supports:
+
+\begin{itemize}[leftmargin=*]
+  \item dataset name and source metadata;
+  \item participant and task identifiers;
+  \item initial human response and final human response;
+  \item advice value, advice source, and advice correctness where available;
+  \item initial correctness and final correctness;
+  \item confidence before and after advice where derivable;
+  \item movement toward or away from advice;
+  \item appropriate reliance, overreliance, underreliance, correct AI reliance, and correct self-reliance labels where the dataset supports them;
+  \item learning-gain and process-trace features for datasets that are not advice-taking datasets.
+\end{itemize}
+
+Raw public datasets are downloaded into \path{artifacts/real_data/raw/}; prepared canonical tables are written to \path{artifacts/real_data/prepared/}. Both are ignored so that GitHub publication does not accidentally redistribute participant data.
+
+\section*{Modeling Layer}
+
+The modeling layer includes standard statistical and machine-learning baselines plus neuro-symbolic components:
+
+\begin{itemize}[leftmargin=*]
+  \item logistic regression and calibrated logistic baselines;
+  \item random forest and gradient-boosting baselines;
+  \item MLP baselines where appropriate;
+  \item symbolic-only rule models;
+  \item weighted and learned fusion models;
+  \item reliance-state neuro-symbolic models;
+  \item ReliaGuard-NS conformal selective-risk control;
+  \item uncertainty-aware gating and conservative offline policy simulation.
+\end{itemize}
+
+The intended contribution is not a clinical score or a universal classifier. The system makes reliance states measurable, auditable, and usable for cautious intervention design.
+
+\section*{Symbolic Reasoning}
+
+The symbolic layer converts behavioral patterns into interpretable rule activations. Example rule families include:
+
+\begin{itemize}[leftmargin=*]
+  \item wrong-advice overreliance;
+  \item correct-advice underreliance;
+  \item confidence inflation after advice;
+  \item correct self-reliance under disagreement;
+  \item low-confidence beneficial reliance;
+  \item process-trace warning and protective rules for GenAI writing workflows.
+\end{itemize}
+
+Rules produce explanation traces and counterfactual suggestions. For example, a case with high advice uptake, wrong advice, and increased confidence can be flagged as a confidence-inflated overreliance risk. The counterfactual explanation can identify which signal would need to change to reduce that risk.
+
+\section*{Evaluation Layer}
+
+The evaluation layer provides reproducible analyses and quality gates:
+
+\begin{itemize}[leftmargin=*]
+  \item AUROC, AUPRC, F1, balanced accuracy, Brier score, and expected calibration error;
+  \item regression metrics such as RMSE, MAE, and $R^2$ where learning or process outcomes are continuous;
+  \item participant-aware, task-aware, random, and cross-dataset validation;
+  \item GEE models with participant clustering for repeated-measures settings;
+  \item bootstrap confidence intervals and split robustness;
+  \item calibration curves, class-conditional calibration, and reliability summaries;
+  \item rule ablations and model ablations;
+  \item sensitivity to labels, thresholds, harm weights, and intervention burden;
+  \item non-causal offline policy simulation and conformal selective-risk summaries.
+\end{itemize}
+
+The evaluation code explicitly distinguishes prediction, association, explanation, observational policy simulation, and causal intervention. Prospective causal claims require new approved human-subject validation.
+
+\section*{API And Demo}
+
+The local FastAPI app serves the static research demo and exposes scoring/report endpoints. The primary static assets are bundled inside the package at \path{src/reliaguard_studio/frontend/static/}. The legacy root-level browser prototype was moved to private local storage because it is not needed for the public code release.
+
+\section*{Prospective Validation Scaffold}
+
+The \path{study_platform/} module is a scaffold for future IRB-approved validation. It includes:
+
+\begin{itemize}[leftmargin=*]
+  \item task definitions;
+  \item random assignment to assistance/gating conditions;
+  \item simulated smoke-test data generation;
+  \item data export and analysis;
+  \item power-analysis helpers;
+  \item recruitment and privacy validation gates;
+  \item quality checks and readiness reports.
+\end{itemize}
+
+This scaffold does not imply that a real prospective study has been completed. It is infrastructure for future validation.
+
+\section*{Important Commands}
+
+\begin{longtable}{p{0.34\linewidth} p{0.60\linewidth}}
+\toprule
+\textbf{Command} & \textbf{Purpose} \\
+\midrule
+\path{python -m pip install -e .[dev]} & Install the package and test dependencies. \\
+\path{nsca search-datasets} & Display the dataset registry and integration decisions. \\
+\path{nsca download-real-data} & Download public datasets into ignored artifacts. \\
+\path{nsca prepare-real-data} & Convert datasets into canonical tables. \\
+\path{nsca run-real-experiments} & Run descriptive analyses, models, statistics, calibration, and policy outputs. \\
+\path{nsca run-cross-dataset} & Refresh construct-transfer and cross-dataset analyses. \\
+\path{nsca run-policy-evaluation} & Run conservative non-causal gating-policy simulations. \\
+\texttt{nsca run-conformal-}\newline\texttt{risk-control} & Run ReliaGuard-NS conformal selective-risk summaries. \\
+\path{nsca run-sensitivity-analyses} & Refresh threshold, burden, label, calibration, and harm-weight sensitivity outputs. \\
+\path{nsca serve-api} & Run the local research demo API. \\
+\path{nsca serve-study} & Run the local prospective-study API scaffold. \\
+\path{pytest} & Run the test suite. \\
+\path{python -m compileall src} & Check Python syntax compilation. \\
+\bottomrule
+\end{longtable}
+
+\section*{Publication Safety}
+
+The public repository is designed to avoid accidental publication of unpublished paper materials:
+
+\begin{itemize}[leftmargin=*]
+  \item \path{paper/} is ignored.
+  \item \path{artifacts/} is ignored.
+  \item \path{.private/} is ignored.
+  \item root-level submission audits and paper-support files are ignored.
+  \item raw downloaded datasets are ignored.
+  \item generated figures, PDFs, source-data tables, and manuscript logs are ignored.
+\end{itemize}
+
+Before publishing, run:
+
+\begin{verbatim}
+git status --ignored
+git check-ignore -v paper artifacts .private Docs
+\end{verbatim}
+
+If these paths are ignored, GitHub publication should include the code package and public project summary but not the private manuscript package.
+
+\section*{Known Boundaries}
+
+The code supports real public-data analyses, but it does not support every possible claim. The project does not make clinical or diagnostic claims. It does not claim delayed recall, transfer, or long-term learning unless future datasets support those outcomes. It does not claim that gating interventions causally improve deployed human behavior without a future prospective randomized study.
+
+\section*{Recommended Public Release Checklist}
+
+\begin{enumerate}[leftmargin=*]
+  \item Confirm that \path{paper/}, \path{artifacts/}, and \path{.private/} are ignored.
+  \item Run \path{pytest}.
+  \item Run \path{python -m compileall src}.
+  \item Review \path{README.md}.
+  \item Confirm that no manuscript PDFs, source-data CSVs, raw datasets, or submission drafts are staged.
+  \item Publish only after choosing a repository license.
+\end{enumerate}
+
+\section*{Summary}
+
+The cleaned public repository is an installable, testable, modular research software package. It retains the scientific machinery required to reproduce analyses from public data while keeping unpublished paper materials private. The result is a safer GitHub-ready project: code, tests, commands, and a clear project summary are visible; manuscript and submission artifacts are not.
+
+\end{document}

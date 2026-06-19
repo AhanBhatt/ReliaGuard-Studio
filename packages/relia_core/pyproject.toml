@@ -1,0 +1,10 @@
+[project]
+name = "relia-core"
+version = "0.1.0"
+description = "Product-facing wrapper for ReliaGuard reliance-state scoring."
+requires-python = ">=3.11"
+dependencies = ["reliaguard-studio"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"

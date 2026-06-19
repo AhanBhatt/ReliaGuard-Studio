@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReliaGuard Studio Stress-Test Demo</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Supplementary AIR-Bench stress-test demo</p>
+        <h1>ReliaGuard Studio Reliance-State Modeling and Conformal Gating</h1>
+        <p class="lede">A local-first interface for inspecting stress-test sessions, symbolic rule traces, uncertainty, and counterfactual guidance. The manuscript's main evidence comes from public real human-AI decision datasets.</p>
+      </div>
+      <div class="hero-card">
+        <p class="hero-label">Current demo mode</p>
+        <strong>Supplementary stress test</strong>
+        <p>Use this interface to inspect benchmark tasks, simulated sessions, model outputs, uncertainty, symbolic rules, and counterfactual interventions.</p>
+      </div>
+    </header>
+
+    <section class="grid">
+      <aside class="panel controls">
+        <h2>Session Controls</h2>
+        <label>Task family
+          <select id="taskFamily"></select>
+        </label>
+        <label>Assistance condition
+          <select id="conditionId"></select>
+        </label>
+        <button id="loadSample">Load stress-test session</button>
+        <button id="scoreSession" class="secondary">Score loaded session</button>
+        <button id="exportReport" class="ghost">Export report JSON</button>
+
+        <div class="notice">
+          <h3>Privacy</h3>
+          <p>The demo stores only local session reports on this machine. No personally sensitive information is collected by default.</p>
+        </div>
+
+        <div class="notice">
+          <h3>Metric glossary</h3>
+          <ul id="metricGlossary"></ul>
+        </div>
+      </aside>
+
+      <section class="panel workspace">
+        <section>
+          <h2>Stress-Test Snapshot</h2>
+          <div class="split">
+            <div id="benchmarkSnapshot" class="card-block empty">The benchmark summary will load from the local API.</div>
+            <div class="card-block">
+              <strong>Condition effects</strong>
+              <table class="summary-table">
+                <thead>
+                  <tr>
+                    <th>Condition</th>
+                    <th>Immediate</th>
+                    <th>Recall</th>
+                    <th>Transfer</th>
+                    <th>Verification fail</th>
+                    <th>Overreliance</th>
+                  </tr>
+                </thead>
+                <tbody id="conditionSummary"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <div class="split">
+          <section>
+            <h2>Task Snapshot</h2>
+            <div id="taskCard" class="card-block empty">Load a session to inspect the AIR-Bench task prompt and flawed-answer stressor.</div>
+          </section>
+          <section>
+            <h2>Behavioral Session Trace</h2>
+            <div id="sessionCard" class="card-block empty">Stress-test session metrics will appear here.</div>
+          </section>
+        </div>
+
+        <section>
+          <h2>Model Outputs</h2>
+          <div class="score-grid">
+            <div class="score-card">
+              <span>Neural overreliance probability</span>
+              <strong id="neuralScore">-</strong>
+            </div>
+            <div class="score-card">
+              <span>Symbolic overreliance probability</span>
+              <strong id="symbolicScore">-</strong>
+            </div>
+            <div class="score-card accent">
+              <span>Fusion overreliance probability</span>
+              <strong id="fusionScore">-</strong>
+            </div>
+            <div class="score-card">
+              <span>Uncertainty</span>
+              <strong id="uncertaintyScore">-</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="split">
+          <section>
+            <h2>Active Rules</h2>
+            <div id="rulesList" class="card-block empty">Score a session to inspect fuzzy and temporal rule activations.</div>
+          </section>
+          <section>
+            <h2>Counterfactual Guidance</h2>
+            <div id="counterfactuals" class="card-block empty">Counterfactual suggestions will appear after scoring.</div>
+          </section>
+        </section>
+
+        <section class="notice footer-note">
+          <h3>Research framing</h3>
+          <p>The system studies appropriate reliance patterns in human-AI decision making. It is not a medical or diagnostic system.</p>
+        </section>
+      </section>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
