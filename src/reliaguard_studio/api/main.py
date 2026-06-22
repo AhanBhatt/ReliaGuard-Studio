@@ -23,6 +23,28 @@ from .product import (
     policy_simulation,
     predict_reliance_case,
 )
+from .platform import (
+    GuardrailCheck,
+    IngestRequest,
+    InteractionEvent,
+    ProjectCreate,
+    ReplayRequest,
+    ReviewLabel,
+    create_project,
+    demo_customer_support_records,
+    get_project,
+    guardrail_check,
+    ingest_records,
+    intervention_templates,
+    label_review,
+    list_projects,
+    log_interaction,
+    monitoring_summary,
+    preview_columns,
+    reports as platform_reports,
+    replay_logs,
+    review_queue,
+)
 from ..data.storage import init_db, save_report, save_session
 from ..evaluation.runner import run_full_experiment
 from ..models.heuristic import legacy_heuristic_score
@@ -175,6 +197,111 @@ def relia_model_card() -> dict[str, Any]:
 @app.get("/api/evaluation-lab")
 def model_evaluation_lab() -> dict[str, Any]:
     return evaluation_lab()
+
+
+@app.get("/v1/projects")
+@app.get("/api/v1/projects")
+def api_projects() -> dict[str, Any]:
+    return {"projects": list_projects()}
+
+
+@app.post("/v1/projects")
+@app.post("/api/v1/projects")
+def api_create_project(payload: ProjectCreate) -> dict[str, Any]:
+    return create_project(payload)
+
+
+@app.get("/v1/projects/{project_id}")
+@app.get("/api/v1/projects/{project_id}")
+def api_project(project_id: str) -> dict[str, Any]:
+    project = get_project(project_id)
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+
+@app.post("/v1/events/log")
+@app.post("/api/v1/events/log")
+def api_log_interaction(payload: InteractionEvent) -> dict[str, Any]:
+    return log_interaction(payload)
+
+
+@app.post("/v1/guardrail/check")
+@app.post("/api/v1/guardrail/check")
+def api_guardrail_check(payload: GuardrailCheck) -> dict[str, Any]:
+    return guardrail_check(payload)
+
+
+@app.post("/v1/ingest/preview")
+@app.post("/api/v1/ingest/preview")
+def api_ingest_preview(records: list[dict[str, Any]]) -> dict[str, Any]:
+    return preview_columns(records)
+
+
+@app.post("/v1/ingest/validate")
+@app.post("/api/v1/ingest/validate")
+def api_ingest_validate(payload: IngestRequest) -> dict[str, Any]:
+    return ingest_records(payload)
+
+
+@app.get("/v1/review-queue")
+@app.get("/api/v1/review-queue")
+def api_review_queue(project_id: str | None = None) -> dict[str, Any]:
+    return {"cases": review_queue(project_id)}
+
+
+@app.post("/v1/review-queue/label")
+@app.post("/api/v1/review-queue/label")
+def api_label_review(payload: ReviewLabel) -> dict[str, Any]:
+    try:
+        return label_review(payload)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/v1/interventions")
+@app.get("/api/v1/interventions")
+def api_interventions() -> dict[str, Any]:
+    return {"interventions": intervention_templates()}
+
+
+@app.get("/v1/reports")
+@app.get("/api/v1/reports")
+def api_reports(project_id: str | None = None) -> dict[str, Any]:
+    return {"reports": platform_reports(project_id)}
+
+
+@app.post("/v1/replay")
+@app.post("/api/v1/replay")
+def api_replay(payload: ReplayRequest) -> dict[str, Any]:
+    return replay_logs(payload)
+
+
+@app.get("/v1/monitoring")
+@app.get("/api/v1/monitoring")
+def api_monitoring(project_id: str | None = None) -> dict[str, Any]:
+    return monitoring_summary(project_id)
+
+
+@app.get("/v1/demo/customer-support")
+@app.get("/api/v1/demo/customer-support")
+def api_demo_customer_support() -> dict[str, Any]:
+    return {
+        "vertical": "Customer Support Copilot",
+        "description": "Support agents choose refund, deny refund, escalate, or request more information; ReliaGuard audits over-acceptance and under-use of AI advice.",
+        "records": demo_customer_support_records(),
+        "mapping": {
+            "user_id": "agent_id",
+            "task_id": "ticket_id",
+            "initial_answer": "human_first_decision",
+            "initial_confidence": "confidence_before_ai",
+            "ai_advice": "model_recommendation",
+            "ai_confidence": "model_confidence",
+            "final_answer": "human_final_decision",
+            "ground_truth": "true_label",
+            "context": "domain",
+        },
+    }
 
 
 @app.get("/api/config")

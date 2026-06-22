@@ -16,6 +16,12 @@ const outputs = [
   "Selective-gating action"
 ];
 
+const modes = [
+  ["Audit Mode", "Upload historical logs and generate an overreliance/underreliance report."],
+  ["Shadow Mode", "Stream live events, score them, and monitor risk without intervening yet."],
+  ["Guardrail Mode", "Call the live API during a decision and return allow, verification, uncertainty, delay, or review actions."]
+];
+
 export default function HomePage() {
   return (
     <PageShell eyebrow="Production AI evaluation platform" title="Average accuracy is a blunt instrument. ReliaGuard shows the hidden reliance failures.">
@@ -40,8 +46,9 @@ export default function HomePage() {
               ))}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
+              <ButtonLink href="/upload">Audit your logs</ButtonLink>
               <ButtonLink href="/simulator">Try simulator</ButtonLink>
-              <ButtonLink href="/gating">Open gating dashboard</ButtonLink>
+              <ButtonLink href="/review">Open review queue</ButtonLink>
             </div>
           </div>
         </InstrumentCard>
@@ -75,6 +82,15 @@ export default function HomePage() {
             </div>
           </Card>
         </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-3">
+        {modes.map(([mode, body]) => (
+          <Card key={mode}>
+            <Badge tone={mode.startsWith("Guardrail") ? "risk" : mode.startsWith("Shadow") ? "warn" : "info"}>{mode}</Badge>
+            <p className="mt-4 text-lg font-black leading-7 text-ink">{body}</p>
+          </Card>
+        ))}
       </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-3">

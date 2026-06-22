@@ -28,13 +28,124 @@ The underlying research pipeline integrates **43,263 public records from 2,229 p
 | --- |
 | ![Model evaluation lab with prediction and calibration summaries](docs/assets/screenshots/04-evaluation-lab.png) |
 
+| Upload logs audit | Review queue |
+| --- | --- |
+| ![Upload logs audit report with column mapping and highest-risk cases](docs/assets/screenshots/05-upload-audit.png) | ![Review queue with flagged cases and reviewer labels](docs/assets/screenshots/06-review-queue.png) |
+
+| Monitoring |
+| --- |
+| ![Monitoring dashboard with reliance states, actions, feedback, and context risk](docs/assets/screenshots/07-monitoring.png) |
+
 The app is designed as a product, not just a research notebook:
 
+- **Upload Logs:** bring CSV, JSON, or JSONL interaction logs, map columns to ReliaGuard fields, validate missing fields, and generate an audit report.
+- **Project workspaces:** keep datasets, thresholds, policies, model versions, reviewer notes, reports, and export history organized by AI product.
+- **Review queue:** label flagged cases as true harmful reliance, false positive, uncertain, bad ground truth, intervention worked, or intervention too burdensome.
+- **Replay logs:** ask what would have happened if ReliaGuard used a different alpha or gating policy on historical data.
+- **Monitoring:** track reliance states, risk by context, action rates, and reviewer feedback as events stream in.
 - **Case simulator:** score one human-AI decision and inspect state, risk, uncertainty, active rules, counterfactual, and recommended action.
 - **Conformal gating dashboard:** move the allowed harmful-miss rate alpha and watch capture, missed harmful cases, and intervention burden change.
 - **Evaluation lab:** compare predictive metrics, calibration metrics, reliability summaries, and split rigor.
 - **Policy simulator:** compare no gating, confidence thresholds, symbolic-rule gating, and ReliaGuard-NS conformal gating.
 - **Safety/limitations panel:** keeps the boundary explicit: this is AI evaluation, not clinical diagnosis or causal proof.
+
+## Three Ways To Use ReliaGuard
+
+### 1. Audit historical logs
+
+Upload your own interaction logs and map columns into the canonical schema:
+
+| ReliaGuard field | Typical source columns |
+| --- | --- |
+| `user_id` | `agent_id`, `learner_id`, `reviewer_id` |
+| `task_id` | `ticket_id`, `question_id`, `case_id` |
+| `initial_answer` | `human_first_decision` |
+| `initial_confidence` | `confidence_before_ai` |
+| `ai_advice` | `model_recommendation` |
+| `ai_confidence` | `model_confidence` |
+| `final_answer` | `human_final_decision` |
+| `ground_truth` | `true_label`, `QA outcome`, `test_result` |
+| `context` | `domain`, `task type`, `model name` |
+
+ReliaGuard validates missing fields, explains which analyses are possible, scores reliance states, creates review-queue entries, and generates an audit report.
+
+Try the sample:
+
+```text
+docs/examples/customer_support_copilot_logs.csv
+```
+
+### 2. Stream events with an SDK
+
+Python:
+
+```python
+from reliaguard import ReliaGuard
+
+rg = ReliaGuard(api_key="local-dev")
+
+rg.log_interaction(
+    project_id="support-copilot",
+    user_id="agent_123",
+    task_id="ticket_456",
+    initial_answer="refund",
+    initial_confidence=0.72,
+    ai_advice="deny_refund",
+    ai_confidence=0.88,
+    final_answer="deny_refund",
+    ground_truth="refund",
+    context={"domain": "customer_support", "model": "gpt-4.1"},
+)
+```
+
+TypeScript:
+
+```ts
+await reliaguard.logInteraction({
+  projectId: "ai-tutor",
+  userId: "learner_42",
+  taskId: "algebra_17",
+  initialAnswer: "x = 4",
+  initialConfidence: 0.61,
+  aiAdvice: "x = 5",
+  aiConfidence: 0.84,
+  finalAnswer: "x = 5",
+  groundTruth: "x = 4",
+  context: { domain: "tutoring" }
+});
+```
+
+SDKs live in:
+
+```text
+sdks/python/
+sdks/typescript/
+```
+
+### 3. Call a live guardrail
+
+```http
+POST /v1/guardrail/check
+```
+
+Example response:
+
+```json
+{
+  "state": "harmful_overreliance",
+  "risk": 0.91,
+  "uncertainty": 0.76,
+  "recommended_action": "request_verification",
+  "message": "Ask the user to compare evidence before accepting the AI recommendation.",
+  "active_rules": [
+    "human_advice_disagreement",
+    "wrong_advice_overreliance_risk",
+    "advice_adoption"
+  ]
+}
+```
+
+Recommended actions are `allow`, `request_verification`, `show_uncertainty`, `delay`, and `route_to_review`.
 
 ## How The Simulator Works
 
@@ -115,6 +226,8 @@ The simulator is not a clinical tool and does not claim that warnings causally c
 apps/web                 Next.js + TypeScript + Tailwind product frontend
 apps/api                 FastAPI product API entrypoint
 packages/relia_core      Product-facing wrapper for reliance-state scoring
+sdks/python              Installable Python client for event logging and guardrail checks
+sdks/typescript          TypeScript client for browser/server AI applications
 src/reliaguard_studio    Python ML, data, evaluation, rules, API, and visualization source
 infra/                   Docker Compose and deployment scaffolding
 docs/                    Architecture, usage guide, model cards, portfolio material
@@ -178,7 +291,7 @@ Invoke-RestMethod http://127.0.0.1:8000/predict-reliance `
 
 ## Reproduce Screenshots
 
-The README images are generated from the live local app using headless Chromium. No browser window is opened.
+The README images are generated from the live local app using headless Chromium. No browser window is opened. The script captures homepage, simulator, gating, evaluation, upload-audit, review-queue, and monitoring views.
 
 ```powershell
 cd apps/web
@@ -195,6 +308,10 @@ docs/assets/screenshots/01-homepage.png
 docs/assets/screenshots/02-simulator-result.png
 docs/assets/screenshots/03-gating-dashboard.png
 docs/assets/screenshots/04-evaluation-lab.png
+docs/assets/screenshots/05-upload-audit.png
+docs/assets/screenshots/06-review-queue.png
+docs/assets/screenshots/07-monitoring.png
+docs/assets/screenshots/readme-contact-sheet.png
 ```
 
 ## Reproduce The Public Analysis Pipeline

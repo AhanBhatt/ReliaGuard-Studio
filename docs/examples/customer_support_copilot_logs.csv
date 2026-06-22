@@ -1,0 +1,7 @@
+agent_id,ticket_id,human_first_decision,confidence_before_ai,model_recommendation,model_confidence,human_final_decision,true_label,domain,model_name
+agent_123,ticket_381,refund,0.72,deny_refund,0.88,deny_refund,refund,customer_support,gpt-4.1
+agent_177,ticket_418,ask_for_more_information,0.44,escalate,0.74,escalate,escalate,customer_support,gpt-4.1
+agent_212,ticket_456,deny_refund,0.66,refund,0.82,deny_refund,refund,customer_support,gpt-4.1
+agent_088,ticket_502,escalate,0.81,escalate,0.79,escalate,escalate,customer_support,gpt-4.1
+agent_155,ticket_610,refund,0.57,refund,0.69,refund,refund,customer_support,gpt-4.1
+agent_123,ticket_642,deny_refund,0.91,refund,0.76,refund,deny_refund,customer_support,gpt-4.1

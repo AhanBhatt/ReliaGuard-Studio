@@ -150,6 +150,18 @@ async function main() {
       await p.waitForTimeout(1200);
     });
     await capture(page, "04-evaluation-lab", `${WEB_URL}/evaluation`);
+    await capture(page, "05-upload-audit", `${WEB_URL}/upload`, async (p) => {
+      await p.getByRole("button", { name: /generate audit report/i }).click();
+      const report = p.getByText(/scored interactions/i);
+      await report.waitFor({ timeout: 15000 });
+      await report.scrollIntoViewIfNeeded();
+    });
+    await capture(page, "06-review-queue", `${WEB_URL}/review`, async (p) => {
+      await p.getByText(/cases waiting or labelled/i).waitFor({ timeout: 15000 });
+    });
+    await capture(page, "07-monitoring", `${WEB_URL}/monitoring`, async (p) => {
+      await p.getByText(/logged events/i).waitFor({ timeout: 15000 });
+    });
   } finally {
     if (browser) {
       await browser.close();

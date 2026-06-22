@@ -27,3 +27,17 @@ export async function getJson(path: string) {
   if (!response.ok) throw new Error(`API ${path} failed`);
   return response.json();
 }
+
+export async function postJson<TBody>(path: string, body: TBody) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body),
+    cache: "no-store"
+  });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`API ${path} failed: ${text || response.statusText}`);
+  }
+  return response.json();
+}
